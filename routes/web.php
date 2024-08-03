@@ -5,6 +5,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserWebController;
 use App\Http\Controllers\CartController;
+use Illuminate\Support\Facades\DB;
+
 
 Route::get('/', function () {
     return view('index');
@@ -113,6 +115,17 @@ Route::get('/rate_star', function () {
 Route::get('/rate_star/{id}/{product_id}/{source}', [ProfileController::class, 'showRateStar'])->name('rate_star');
 
 Route::post('/submit_rating/{id}', [ProfileController::class, 'submitRating'])->name('submit_rating');
+
+
+// routes/web.php
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        return 'Database connection is successful!';
+    } catch (\Exception $e) {
+        return 'Database connection failed: ' . $e->getMessage();
+    }
+});
 
 
 
