@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->json('payment_methods')->nullable();
+        Schema::table('user_webs', function (Blueprint $table) {
+            $table->string('facebook_id')->nullable()->after('google_id');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('payment_methods');
+        Schema::table('user_webs', function (Blueprint $table) {
+            $table->dropColumn('facebook_id');
         });
     }
 };

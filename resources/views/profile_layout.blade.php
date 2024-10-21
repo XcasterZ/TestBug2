@@ -19,9 +19,7 @@
         body {
             font-family: 'Kanit', sans-serif;
         }
-    </style>
-
-    
+    </style> 
     <style>
         .file-info {
             font-size: 14px;

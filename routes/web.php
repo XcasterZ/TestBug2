@@ -6,7 +6,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserWebController;
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\DB;
-
+use App\Http\Controllers\GoogleController;
+use Laravel\Socialite\Facades\Socialite;
+use App\Http\Controllers\FacebookController;
+use Illuminate\Support\Facades\Password;
+// use App\Http\Controllers\FacebookController; // เพิ่ม FacebookController หากต้องการ
+use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\ResetPasswordController;
 
 Route::get('/', function () {
     return view('index');
@@ -106,7 +112,7 @@ Route::post('/cart/updateQuantity', [CartController::class, 'updateQuantity'])->
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 
 
-                
+
 Route::get('/rate_star', function () {
     return view('rate_star');
 })->name('rate_star');
@@ -127,5 +133,43 @@ Route::get('/test-db', function () {
     }
 });
 
+// Google Login
+
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 
+
+Route::get('auth/facebook', [FacebookController::class, 'redirect'])->name('auth.facebook.redirect');
+Route::get('auth/facebook/callback', [FacebookController::class, 'callback'])->name('auth.facebook.callback');
+
+
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+// Route สำหรับการแสดงหน้า verify
+Route::get('/verify', [UserWebController::class, 'showVerifyForm'])->name('verify.otp');
+
+Route::post('/verify-otp', [UserWebController::class, 'verifyOtp'])->name('verify.otp');
+
+Route::post('/password/email', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+
+    // ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมล
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+
+    if ($status === Password::RESET_LINK_SENT) {
+        return response()->json(['success' => true]);
+    } else {
+        return response()->json(['success' => false], 400);
+    }
+})->name('auth.password.email');
+
+Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+
+Route::get('password/reset/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
